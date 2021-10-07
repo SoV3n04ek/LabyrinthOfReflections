@@ -4,8 +4,9 @@
 #include <vector>
 #include <string>
 
-#define MAX_COUNT_ITEMS (3)
-
+#define STANDARD_COUNT_ITEMS (3)
+enum MENU_OPTIONS {PLAY, OPTIONS, EXIT };
+/*
 struct Text
 {
 	std::string str;
@@ -37,83 +38,138 @@ struct Text
 	{
 		this->str = str;
 	}
-};
+};*/
+
+const std::string gameMenu = "Game Menu | Labyrinth of Reflecitons";
 
 class Menu
 {
 private:
-	size_t indexselectedItem;
+	size_t countItems;
+	size_t indexSelectedItem;
 	sf::Font font;
+	std::vector<sf::Text> menuTexts;
 public:
-	sf::Text text[MAX_COUNT_ITEMS];
-	Menu(float width, float height, size_t choozedOption = 0)
+	Menu(float width = 1280, float height = 720, size_t choozedOption = 0)
 	:
-		indexselectedItem(choozedOption)
+		indexSelectedItem(choozedOption),
+		countItems(STANDARD_COUNT_ITEMS)
 	{ 	
-		//if (!font.loadFromFile("arial.ttf"))
-		//{
-		//	// ошибка...
-		//}
-		/*if (!font.loadFromFile("fonts\\arial.ttf"))
-		{ }*/
-		const char* cstrs[MAX_COUNT_ITEMS] = {
+		if (!font.loadFromFile("fonts\\arial.ttf\0"))
+		{ }
+		const char* cstrs[STANDARD_COUNT_ITEMS] = {
 			"Play", "Options", "Exit"
 		};
 
 		sf::Color red = sf::Color::Red;
 		sf::Color white = sf::Color::White;
+		sf::Text text;
 
-		for (int i = 0; i < MAX_COUNT_ITEMS; i++)
+		text.setFont(font);
+		text.setCharacterSize(24);
+		text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+
+		for (int i = 0; i < countItems; i++)
 		{
-			text[i].setFont(font);
-			if (i == indexselectedItem)
-				text[i].setFillColor(red);
+			if (i == indexSelectedItem)
+				text.setFillColor(red);
 			else
-				text[i].setFillColor(white);
-			text[i].setCharacterSize(24); 
-			text[i].setString(cstrs[i]);
-			text[i].setPosition(sf::Vector2f(width / 2, height / (MAX_COUNT_ITEMS + 1) * (i+1)));
-			text[i].setStyle(sf::Text::Bold | sf::Text::Underlined);
+				text.setFillColor(white);
+		
+			text.setString(cstrs[i]);
+			text.setPosition(sf::Vector2f(width / 2, height / (STANDARD_COUNT_ITEMS + 1) * (i + 1)));
+			menuTexts.push_back(text);
 		}		
-
 	}
 	~Menu() { 	}
 
-	Menu& voidSetOption(size_t option)
+	Menu& setTextColor(size_t optionIndex, sf::Color color)
 	{
-		indexselectedItem = option;
+		size_t i = 0;
+		
+		for (auto& text : menuTexts)
+		{
+			if (i == indexSelectedItem)
+			{
+				text.setFillColor(color);
+				break;
+			}
+			++i;
+		}
+
 		return *this;
 	}
 
-	/*void addOption(Text option)
+	void down()
 	{
-		options.push_back(option);
+		if (indexSelectedItem + 1 >= countItems)
+			return;
+		setTextColor(indexSelectedItem, sf::Color::White);
+		++indexSelectedItem;
+		setTextColor(indexSelectedItem, sf::Color::Red);
 	}
+
+	void up()
+	{
+		if (indexSelectedItem == 0)
+			return;
+		setTextColor(indexSelectedItem, sf::Color::White);
+		--indexSelectedItem;
+		setTextColor(indexSelectedItem, sf::Color::Red);
+	}
+
+	void addOption(sf::Text option) { menuTexts.push_back(option); }
+
 	void addOption(const std::string& str, int x, int y)
 	{
-		Text option(str, x, y);
-		options.push_back(option);
-	}*/
+		countItems++;
+		sf::Text option(str, font, 24);
+		sf::Color color(sf::Color::White);
+		option.setFillColor(color);
+		menuTexts.push_back(option);
+	}
 
 	void draw(sf::RenderWindow &window)
 	{
-		for (int i = 0; i < MAX_COUNT_ITEMS; i++)
-			window.draw(text[i]);
+		for (auto &text : menuTexts)
+			window.draw(text);
 	}
 
-	void printMenu() const
+	size_t getIndexSelectedItem() const { return indexSelectedItem;	}
+
+	void setFillColor(size_t index, sf::Color color)
 	{
-	/*	size_t option = 0;
-		for (auto it = options.begin(); it != options.end(); it++, option++) {
-			GotoXY(it->x, it->y);
-			if (option == choozedOption)
-			{
-				TextColor(YELLOW);
-			}
+		size_t i = 0;
+		for (auto& text : menuTexts)
+		{
+			text.setFillColor(color);
+			break;
+		}		
+	}
 
-			std::cout << it->str << std::endl;
+	Menu operator++(int)
+	{
+		Menu temp = *this;
+		++*this;
+		return temp;
+	}
 
-			TextColor(LIGHTGRAY);
-		}*/
+	Menu& operator++()
+	{
+		indexSelectedItem++;
+		return *this;
+	}
+
+	Menu operator--(int)
+	{
+		Menu temp = *this;
+		--*this;
+		return temp;
+	}
+
+	Menu& operator--()
+	{
+		indexSelectedItem--;
+		return *this;
 	}
 };

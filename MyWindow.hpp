@@ -19,7 +19,25 @@ public:
 	/*
 	* Get the current config
 	*/
+	void clear(sf::Color color)
+	{
+		window.clear(color);
+	}
+
+	sf::RenderWindow& getRenderWindow() { return window; }
+
+	void close() { window.close(); }
+	
+
+	bool pollEvent(sf::Event& evnt) { return window.pollEvent(evnt); }
+	void display() { window.display(); }
+	void setFramerateLimit(unsigned int limit) { window.setFramerateLimit(limit); }
+	
+	template <class T>
+	void draw(T& item) { window.draw(item); }
+	bool isOpen() const { return window.isOpen();  }
+	
+	void setIcon(unsigned int width, unsigned int height, const sf::Uint8 *pixels) { window.setIcon(width, height, pixels); }
+
 	Config* getConfig() const { return config; }
-
-
 };
